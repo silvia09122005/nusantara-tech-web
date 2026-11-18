@@ -52,23 +52,23 @@ const services = [
 const selectedWork = [
   {
     number: "01",
-    title: "Web Development",
+    title: "Nusantara Commerce",
     description:
-      "A clear, fast company website designed to help a growing brand reach and convert new customers.",
+      "A Web Development project creating a fast, seamless online store for browsing and purchasing local products.",
     icon: Code2,
   },
   {
     number: "02",
-    title: "Mobile App",
+    title: "GoSehat Mobile",
     description:
-      "A friendly mobile experience that makes it easier for customers to manage everyday tasks on the go.",
+      "A Mobile App that helps people find nearby healthcare services and manage their wellness on the go.",
     icon: Smartphone,
   },
   {
     number: "03",
-    title: "UI/UX Design",
+    title: "FinPlan Dashboard",
     description:
-      "A thoughtful product interface that turns a complex workflow into a simple, confident journey.",
+      "A UI/UX Design project that makes personal finances easier to understand with a clear, intuitive dashboard.",
     icon: Layers3,
   },
 ];
