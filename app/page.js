@@ -49,6 +49,30 @@ const services = [
   },
 ];
 
+const selectedWork = [
+  {
+    number: "01",
+    title: "Web Development",
+    description:
+      "A clear, fast company website designed to help a growing brand reach and convert new customers.",
+    icon: Code2,
+  },
+  {
+    number: "02",
+    title: "Mobile App",
+    description:
+      "A friendly mobile experience that makes it easier for customers to manage everyday tasks on the go.",
+    icon: Smartphone,
+  },
+  {
+    number: "03",
+    title: "UI/UX Design",
+    description:
+      "A thoughtful product interface that turns a complex workflow into a simple, confident journey.",
+    icon: Layers3,
+  },
+];
+
 const stats = [
   { value: "120+", label: "Projects delivered" },
   { value: "45+", label: "Happy partners" },
@@ -57,12 +81,42 @@ const stats = [
 
 export default function HomePage() {
   const [menuOpen, setMenuOpen] = useState(false);
-  const [formSubmitted, setFormSubmitted] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [formStatus, setFormStatus] = useState(null);
 
-  function handleSubmit(event) {
+  async function handleSubmit(event) {
     event.preventDefault();
-    setFormSubmitted(true);
-    event.currentTarget.reset();
+    const form = event.currentTarget;
+    const formData = new FormData(form);
+    formData.append("access_key", "200d4527-7284-41ea-9276-c759cf41d75a");
+    setIsSubmitting(true);
+    setFormStatus(null);
+
+    try {
+      const response = await fetch("https://api.web3forms.com/submit", {
+        method: "POST",
+        body: formData,
+      });
+      const result = await response.json();
+
+      if (!response.ok || !result.success) {
+        throw new Error(result.message || "Unable to send your message.");
+      }
+
+      form.reset();
+      setFormStatus({
+        type: "success",
+        message: "Thanks for reaching out! Your message has been sent.",
+      });
+    } catch (error) {
+      setFormStatus({
+        type: "error",
+        message:
+          error.message || "Something went wrong. Please try again later.",
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   }
 
   function closeMenu() {
@@ -395,7 +449,52 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section className="bg-white py-20 sm:py-24">
+      <section id="selected-work" className="bg-white py-24 sm:py-28">
+        <div className="mx-auto max-w-7xl px-5 sm:px-8 lg:px-12">
+          <div className="flex flex-col justify-between gap-6 sm:flex-row sm:items-end">
+            <div className="max-w-2xl">
+              <p className="text-xs font-extrabold uppercase tracking-[0.2em] text-ocean-500">
+                A few recent favorites
+              </p>
+              <h2 className="mt-4 text-4xl font-extrabold leading-tight tracking-[-0.04em] text-navy-900 sm:text-5xl">
+                Selected Work
+              </h2>
+            </div>
+            <p className="max-w-sm text-base leading-7 text-slate-600">
+              A glimpse at the thoughtful digital experiences we love creating.
+            </p>
+          </div>
+
+          <div className="mt-12 grid gap-5 lg:grid-cols-3">
+            {selectedWork.map((project) => {
+              const Icon = project.icon;
+              return (
+                <article
+                  key={project.number}
+                  className="group flex h-full flex-col rounded-3xl border border-slate-200 bg-white p-7 shadow-sm transition duration-300 hover:-translate-y-1 hover:border-blue-200 hover:shadow-soft sm:p-8"
+                >
+                  <div className="flex items-center justify-between">
+                    <span className="flex h-14 w-14 items-center justify-center rounded-2xl bg-ocean-100 text-ocean-500 transition group-hover:bg-navy-900 group-hover:text-white">
+                      <Icon size={25} strokeWidth={1.8} />
+                    </span>
+                    <span className="text-sm font-bold tracking-widest text-slate-300">
+                      {project.number}
+                    </span>
+                  </div>
+                  <h3 className="mt-7 text-xl font-extrabold tracking-tight text-navy-900">
+                    {project.title}
+                  </h3>
+                  <p className="mt-3 text-sm leading-7 text-slate-600">
+                    {project.description}
+                  </p>
+                </article>
+              );
+            })}
+          </div>
+        </div>
+      </section>
+
+      <section className="bg-white py-12 sm:py-16">
         <div className="mx-auto max-w-7xl px-5 sm:px-8 lg:px-12">
           <div className="relative overflow-hidden rounded-[2rem] bg-navy-900 px-7 py-12 text-white sm:px-12 sm:py-14 lg:px-16">
             <div className="absolute -right-20 -top-32 h-80 w-80 rounded-full bg-ocean-500/20 blur-[80px]" />
@@ -421,7 +520,7 @@ export default function HomePage() {
 
       <section
         id="contact"
-        className="scroll-mt-24 border-t border-slate-100 bg-slate-50 py-24 sm:py-28"
+        className="scroll-mt-24 border-t border-slate-100 bg-slate-50 py-16 sm:py-20"
       >
         <div className="mx-auto grid max-w-7xl gap-12 px-5 sm:px-8 lg:grid-cols-[0.85fr_1.15fr] lg:gap-20 lg:px-12">
           <div>
@@ -507,23 +606,26 @@ export default function HomePage() {
             <div className="mt-6 flex flex-col gap-4 sm:flex-row sm:items-center">
               <button
                 type="submit"
-                className="inline-flex min-h-12 items-center justify-center gap-2 rounded-full bg-navy-900 px-6 text-sm font-bold text-white transition hover:bg-ocean-500"
+                disabled={isSubmitting}
+                className="inline-flex min-h-12 items-center justify-center gap-2 rounded-full bg-navy-900 px-6 text-sm font-bold text-white transition hover:bg-ocean-500 disabled:cursor-not-allowed disabled:opacity-70"
               >
-                Send message <ArrowRight size={16} />
+                {isSubmitting ? "Sending..." : "Send message"}
+                {!isSubmitting && <ArrowRight size={16} />}
               </button>
-              {formSubmitted && (
+              {formStatus && (
                 <p
                   role="status"
-                  className="text-sm font-semibold text-emerald-700"
+                  aria-live="polite"
+                  className={`text-sm font-semibold ${
+                    formStatus.type === "success"
+                      ? "text-emerald-700"
+                      : "text-red-600"
+                  }`}
                 >
-                  Thanks for reaching out! This demo form is not connected yet.
+                  {formStatus.message}
                 </p>
               )}
             </div>
-            <p className="mt-4 text-xs leading-5 text-slate-400">
-              This demo form does not send data to a server. Connect it to your
-              preferred form service or API to receive submissions.
-            </p>
           </form>
         </div>
       </section>
